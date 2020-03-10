@@ -1,5 +1,5 @@
 # Project Svarog
-# Creative Ethical Wealth Management Platform
+# Ethical Wealth Management Platform
 
 
 
