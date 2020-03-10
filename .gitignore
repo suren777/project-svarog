@@ -1,0 +1,5 @@
+*.ipynb
+*.pyc
+.vscode/
+wealthEnv/
+lib/DataConnectors/data_grabber.py

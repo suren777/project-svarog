@@ -1,0 +1,125 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    background-color: #fff;
+    color: #555;
+    font-size: 20px;
+    font-weight: 300;
+    font-family: sans-serif, 'Arial'
+}
+
+header {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url(back_ground.jpeg);
+    background-size: cover;
+    background-position: center;
+    height: 50vh;
+}
+
+h1 {
+    margin: 0;
+    color: rgba(182, 177, 177, 0.836);
+    font-size: 240%;
+    font-weight: 300;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    word-spacing: 4px;
+}
+
+.project-title {
+    margin-top: 10px;
+}
+
+.project-box {
+    margin: 10px;
+/*    border: 1px solid black;*/
+    height: 800px;
+}
+
+.settings-panel {
+    width: 20%;
+    padding: 2px;
+/*    height: 50%;*/
+    float: left;
+    background-color: rgba(137, 137, 137, 0.12);
+/*    border: 1px solid black;*/
+}
+
+.results-panel {
+    width: 80%;
+    height: 100%;
+    padding: 2px;
+    float: left;
+    text-align: center;
+}
+
+.clearfix:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+
+.custom-tabs-container {
+    width: 100%;
+}
+
+.custom-tabs {
+    border-top-left-radius: 3px;
+    background-color: #fff;
+    border-bottom: 1px solid rgba(137, 137, 137, 0.12);
+    font-size: 15px;
+}
+
+.custom-tab {
+    color: #fff;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    border-top: 3px solid transparent !important;
+    border-left: 0px !important;
+    border-right: 0px !important;
+    border-bottom: 0px !important;
+    background-color: rgba(137, 137, 137, 0.12);
+    padding: 12px !important;
+    font-family: "system-ui";
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+}
+
+.custom-tab--selected {
+    color: black;
+    border-left: 1px solid lightgrey !important;
+    border-right: 1px solid lightgrey !important;
+    border-top: 3px solid #e36209 !important;
+    border-bottom: 0px !important;
+    background-color: rgba(137, 137, 137, 0.12) !important;
+}
+
+.input-box {
+    margin: 10px 1px 0 1px;
+    background-color: rgba(227, 98, 9, 0.1);
+    padding: 5px;
+}
+
+.input-box-label, .input-box-input {
+    font-size: 15px !important;
+    font-weight: 300;
+    font-family: sans-serif, 'Arial';
+    float:left;
+        
+}
+.input-box-label{
+    width:60%;
+}
+.input-box-input {
+    width: 40%;
+}
+
+.graph-settings{
+    margin: auto;
+    display: inline-block;
+}
