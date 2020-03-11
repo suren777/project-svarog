@@ -1,5 +1,6 @@
 *.ipynb
 *.pyc
 .vscode/
+*.env
 wealthEnv/
 lib/DataConnectors/data_grabber.py

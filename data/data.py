@@ -1,4 +1,3 @@
-API_KEY = "UTBU20Q0ODAYZ7PP"
 DB_LOC = "data/market_data.db"
 good_symbols = [
     "AAME",
