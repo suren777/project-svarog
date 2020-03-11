@@ -36,12 +36,6 @@ itsdangerous==1.1.0
 jedi==0.16.0
 Jinja2==2.11.1
 jsonschema==3.2.0
-jupyter==1.0.0
-jupyter-client==6.0.0
-jupyter-console==6.1.0
-jupyter-contrib-core==0.3.3
-jupyter-core==4.6.3
-jupyter-nbextensions-configurator==0.4.1
 MarkupSafe==1.1.1
 mccabe==0.6.1
 mistune==0.8.4
@@ -66,7 +60,6 @@ Pygments==2.5.2
 pyrsistent==0.15.7
 python-dateutil==2.8.1
 pytz==2019.3
-pywin32==227
 pywinpty==0.5.7
 PyYAML==5.3
 pyzmq==19.0.0
