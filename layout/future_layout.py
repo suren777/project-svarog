@@ -5,25 +5,46 @@ from layout.reusable import create_input_box
 import plotly.graph_objects as go
 import numpy as np
 from app import app
+import dash_bootstrap_components as dbc
 
 
-def render_future_profile_settings():
+def render_future_layout():
+
     return [
-        html.Div(
-            children=[
-                create_input_box("Simulation Years", 10, "sim-years"),
-                create_input_box(
-                    "Savings Interest %", 0.2, "savings-interest"
+        dbc.Row(
+            [
+                dbc.Col(
+                    [
+                        html.H2("Let's talk Future"),
+                        html.P(
+                            """\
+                            Asset protection is the concept of and strategies for 
+                            guarding one's wealth. Asset protection is a 
+                            component of financial planning intended to protect 
+                            one's assets from creditor claims. Individuals and 
+                            business entities use asset protection techniques 
+                            to limit creditors' access to certain valuable assets 
+                            while operating within the bounds of debtor-creditor law."""
+                        ),
+                        create_input_box("Years Forward", 10, "sim-years"),
+                        create_input_box(
+                            "Savings Interest %", 0.2, "savings-interest"
+                        ),
+                        create_input_box(
+                            "Investments Interest %", 6, "investment-interest"
+                        ),
+                    ],
+                    md=4,
                 ),
-                create_input_box(
-                    "Investments Interest %", 6, "investment-interest"
+                dbc.Col(
+                    [
+                        html.H2("How does it apply to you?"),
+                        dcc.Loading(
+                            html.Div(id="future-fin-health-projection",)
+                        ),
+                    ]
                 ),
             ]
-        ),
-        html.Div(
-            id="future-fin-health-projection",
-            children=generate_future_projection(10, 0.2, 6),
-            className="graph-settings",
         ),
     ]
 
@@ -112,8 +133,8 @@ def generate_future_projection(years, savings_ir, investments_ir):
         title="Balance Projection",
         plot_bgcolor="#fff",
         paper_bgcolor="#fff",
-        width=800,
-        height=500,
+        # width=800,
+        # height=500,
     )
 
     return dcc.Graph(figure=fig)

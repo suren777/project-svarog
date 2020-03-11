@@ -1,38 +1,115 @@
-from dash.dependencies import Input, Output
+import dash
+from dash.dependencies import Input, Output, State
+import dash_bootstrap_components as dbc
 import dash_html_components as html
 import dash_core_components as dcc
+import dash_bootstrap_components as dbc
 from app import app
 from layout.reusable import create_input_box
 import plotly.graph_objects as go
 
 
-def render_profile_settings():
+def make_card(name, content):
+    # we use this function to make the example items to avoid code duplication
+    return dbc.Card(
+        [dbc.CardBody([html.H5(name, className="card-title")] + content,)]
+    )
+
+
+def profile_settings():
+    return dbc.Row(
+        [
+            dbc.Col(
+                make_card(
+                    "Current Balance",
+                    [
+                        create_input_box("Bank Account", 1500, "bank-account"),
+                        create_input_box("Savings", 1500, "my-savings"),
+                        create_input_box("Income", 4500, "monthtly-income"),
+                        create_input_box("Investments", 200, "my-investments"),
+                    ],
+                )
+            ),
+            dbc.Col(
+                make_card(
+                    "Current Debts",
+                    [create_input_box("Credit Card", 1500, "credit-account")],
+                )
+            ),
+            dbc.Col(
+                make_card(
+                    "Outgoings",
+                    [
+                        create_input_box(
+                            "Bills/Mortgage", 1500, "monthly-bills"
+                        ),
+                        create_input_box("Shopping", 800, "monthly-shopping"),
+                        create_input_box("Savings", 400, "pay-in-savings"),
+                        create_input_box(
+                            "Investments", 0, "pay-in-investments"
+                        ),
+                    ],
+                )
+            ),
+        ]
+    )
+
+
+def render_profile_layout():
+
     return [
-        html.Div(
-            children=[
-                create_input_box("My Age", 33, "my-age"),
-                html.P("Current Credits:"),
-                create_input_box("Bank Account", 1500, "bank-account"),
-                create_input_box("Savings", 1500, "my-savings"),
-                create_input_box("Income", 4500, "monthtly-income"),
-                create_input_box("Investments", 200, "my-investments"),
-                html.P("Current Debts:"),
-                create_input_box("Credit Card", 1500, "credit-account"),
-                html.P("Outgoings:"),
-                create_input_box("Bills/Mortgage", 1500, "monthly-bills"),
-                create_input_box("Shopping", 800, "monthly-shopping"),
-                create_input_box("Savings", 400, "pay-in-savings"),
-                create_input_box("Investments", 0, "pay-in-investments"),
+        dbc.Row(
+            [
+                dbc.Col(
+                    [
+                        html.H2("What is Wealh?"),
+                        html.P(
+                            """\
+                            Wealth refers to value of everything a person or family owns. 
+                            This includes tangible items such as jewelry, housing, cars, 
+                            and other personal property. 
+                            Financial assets such as stocks and bonds, 
+                            which can be traded for cash, 
+                            also contribute to wealth. Wealth is measured as 
+                            "net assets," minus how much debt one owes."""
+                        ),
+                    ],
+                    md=4,
+                ),
+                dbc.Col(
+                    [
+                        html.H2("Where will you be?"),
+                        html.Div(id="waterfall-graph-now",),
+                    ]
+                ),
             ]
         ),
-        html.Div(
-            id="waterfall-graph-now",
-            children=generate_current_waterfall(
-                1500, 1500, 4500, 200, 1500, 1500, 800
-            ),
-            className="graph-settings",
-        ),
+        profile_settings(),
     ]
+
+
+@app.callback(
+    [Output(f"collapse-{i}", "is_open") for i in range(0, 4)],
+    [Input(f"group-{i}-toggle", "n_clicks") for i in range(0, 4)],
+    [State(f"collapse-{i}", "is_open") for i in range(0, 4)],
+)
+def toggle_accordion(n0, n1, n2, n3, is_open0, is_open1, is_open2, is_open3):
+    ctx = dash.callback_context
+
+    if not ctx.triggered:
+        return ""
+    else:
+        button_id = ctx.triggered[0]["prop_id"].split(".")[0]
+
+    if button_id == "group-0-toggle" and n0:
+        return not is_open0, False, False, False
+    if button_id == "group-1-toggle" and n1:
+        return False, not is_open1, False, False
+    elif button_id == "group-2-toggle" and n2:
+        return False, False, not is_open2, False
+    elif button_id == "group-3-toggle" and n3:
+        return False, False, False, not is_open3
+    return False, False, False, False
 
 
 @app.callback(
@@ -87,14 +164,14 @@ def generate_current_waterfall(
             # textposition="outside",
             # text=["+60", "+80", "", "-40", "-20", "Total"],
             y=[
-                bank_acc,
-                savings,
-                salary,
-                investments,
+                float(bank_acc),
+                float(savings),
+                float(salary),
+                float(investments),
                 0,
-                -credit_card,
-                -bills,
-                -shopping,
+                -float(credit_card),
+                -float(bills),
+                -float(shopping),
                 0,
             ],
             connector={"line": {"color": "rgb(63, 63, 63)"}},
@@ -102,12 +179,7 @@ def generate_current_waterfall(
     )
 
     fig.update_layout(
-        title="Income and Outcome graph",
-        showlegend=False,
-        plot_bgcolor="#fff",
-        paper_bgcolor="#fff",
-        width=800,
-        height=500,
+        showlegend=False, plot_bgcolor="#fff", paper_bgcolor="#fff",
     )
     return dcc.Graph(figure=fig)
 

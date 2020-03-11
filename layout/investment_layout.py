@@ -1,6 +1,5 @@
 import dash_html_components as html
 import dash_core_components as dcc
-import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 from dash.dependencies import Input, Output
@@ -12,24 +11,57 @@ from lib.calc.portfolio_tools import (
     calculate_max_sharpe_ratio,
     efficient_frontier,
 )
+import dash_bootstrap_components as dbc
 
 
 def render_investment_layout():
+
     return [
-        html.Div(
-            children=[
-                html.P("Portfolio Proportions"),
-                create_input_box("Equity %", 80, "equity-weight"),
-                create_input_box("Bond %", 20, "bond-weight"),
-                create_input_box("Risk Level", 50, "risk-level"),
+        dbc.Row(
+            [
+                dbc.Col(
+                    [
+                        html.H2("What is Allocation?"),
+                        html.P(
+                            """\
+                            Asset allocation is an investment strategy that 
+                            aims to balance risk and reward by apportioning a 
+                            portfolio's assets according to an individual's goals, 
+                            risk tolerance, and investment horizon. The three main asset 
+                            classes - equities, fixed-income, and cash and equivalents - 
+                            have different levels of risk and return, so each will behave differently over time."""
+                        ),
+                        html.H5("Portfolio Settings"),
+                        create_input_box("Equity %", 80, "equity-weight"),
+                        create_input_box("Bond %", 20, "bond-weight"),
+                        create_input_box("Risk Level", 50, "risk-level"),
+                        dbc.Button(
+                            "Show Portfolio",
+                            color="secondary",
+                            className="mr-1",
+                            id="port-button",
+                            n_clicks=0,
+                        ),
+                    ],
+                    md=4,
+                ),
+                dbc.Col(
+                    [
+                        html.H2("How does portfolio look like?"),
+                        dcc.Loading(html.Div(id="investment-view",)),
+                    ]
+                ),
             ]
         ),
-        html.Div(
-            id="investment-view",
-            children=generate_portfolio_stock_view(),
-            className="graph-settings",
-        ),
     ]
+
+
+@app.callback(
+    Output("investment-view", "children"), [Input("port-button", "n_clicks")],
+)
+def run_portfolio(n_clicks):
+    if n_clicks > 0:
+        return generate_portfolio_stock_view()
 
 
 @app.callback(
@@ -79,5 +111,6 @@ def generate_portfolio_stock_view():
             ),
         ]
     )
-    fig.update_layout(height=500, width=800)
+    fig.update_layout(plot_bgcolor="#fff", paper_bgcolor="#fff")
+    # fig.update_layout(height=500, width=800)
     return dcc.Graph(figure=fig)
