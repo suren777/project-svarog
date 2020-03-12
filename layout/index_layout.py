@@ -125,5 +125,5 @@ def render_page(url):
     elif url == "/investments":
         return render_investment_layout()
     else:
-        return [1, 1]
+        return html.H4("404 Page Not Found")
 

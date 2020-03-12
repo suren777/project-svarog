@@ -1,12 +1,12 @@
 import dash
-from dash.dependencies import Input, Output, State
 import dash_bootstrap_components as dbc
-import dash_html_components as html
 import dash_core_components as dcc
-import dash_bootstrap_components as dbc
+import dash_html_components as html
+import plotly.graph_objects as go
+from dash.dependencies import Input, Output, State
+
 from app import app
 from layout.reusable import create_input_box
-import plotly.graph_objects as go
 
 
 def make_card(name, content):
@@ -173,4 +173,3 @@ def generate_current_waterfall(
         showlegend=False, plot_bgcolor="#fff", paper_bgcolor="#fff",
     )
     return dcc.Graph(figure=fig)
-
