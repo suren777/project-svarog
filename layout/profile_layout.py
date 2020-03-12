@@ -17,41 +17,32 @@ def make_card(name, content):
 
 
 def profile_settings():
-    return dbc.Row(
+    return dbc.CardDeck(
         [
-            dbc.Col(
-                make_card(
-                    "Current Balance",
-                    [
-                        create_input_box("Bank Account", 1500, "bank-account"),
-                        create_input_box("Savings", 1500, "my-savings"),
-                        create_input_box("Income", 4500, "monthtly-income"),
-                        create_input_box("Investments", 200, "my-investments"),
-                    ],
-                )
+            make_card(
+                "Current Balance",
+                [
+                    create_input_box("Bank Account", 1500, "bank-account"),
+                    create_input_box("Savings", 1500, "my-savings"),
+                    create_input_box("Income", 4500, "monthtly-income"),
+                    create_input_box("Investments", 200, "my-investments"),
+                ],
             ),
-            dbc.Col(
-                make_card(
-                    "Current Debts",
-                    [create_input_box("Credit Card", 1500, "credit-account")],
-                )
+            make_card(
+                "Current Debts",
+                [create_input_box("Credit Card", 1500, "credit-account")],
             ),
-            dbc.Col(
-                make_card(
-                    "Outgoings",
-                    [
-                        create_input_box(
-                            "Bills/Mortgage", 1500, "monthly-bills"
-                        ),
-                        create_input_box("Shopping", 800, "monthly-shopping"),
-                        create_input_box("Savings", 400, "pay-in-savings"),
-                        create_input_box(
-                            "Investments", 0, "pay-in-investments"
-                        ),
-                    ],
-                )
+            make_card(
+                "Outgoings",
+                [
+                    create_input_box("Bills/Mortgage", 1500, "monthly-bills"),
+                    create_input_box("Shopping", 800, "monthly-shopping"),
+                    create_input_box("Savings", 400, "pay-in-savings"),
+                    create_input_box("Investments", 0, "pay-in-investments"),
+                ],
             ),
-        ]
+        ],
+        style={"margin-top": "10px"},
     )
 
 
