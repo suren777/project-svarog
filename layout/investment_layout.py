@@ -42,7 +42,6 @@ def render_investment_layout():
                         html.H5("Portfolio Settings"),
                         create_input_box("Equity %", 80, "equity-weight"),
                         create_input_box("Bond %", 20, "bond-weight"),
-                        create_input_box("Risk Level", 50, "risk-level"),
                         # dbc.Button(
                         #     "Show Portfolio",
                         #     color="secondary",
@@ -61,6 +60,25 @@ def render_investment_layout():
                 ),
             ]
         ),
+        dbc.Row(
+            [
+                dbc.Col([], md=4,),
+                dbc.Col(
+                    dbc.FormGroup(
+                        [
+                            dbc.Label("Risk Level", html_for="slider"),
+                            dcc.Slider(
+                                id="risk-level",
+                                min=0,
+                                max=100,
+                                step=5,
+                                value=50,
+                            ),
+                        ]
+                    ),
+                ),
+            ]
+        ),
         html.Div(id="result-card"),
     ]
 
@@ -72,6 +90,8 @@ def render_investment_layout():
 def run_portfolio(risk_level):
     if risk_level > 0 and risk_level <= 100:
         return generate_portfolio_stock_view(risk_level / 100)
+    else:
+        return generate_portfolio_stock_view(0.00001)
 
 
 @app.callback(
