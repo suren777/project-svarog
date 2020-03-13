@@ -3,6 +3,7 @@ import numpy as np
 import scipy.optimize
 from lib.db.dbutils import get_time_series_from_db
 from data.data import good_symbols
+from common.extensions import cache
 
 
 def portfolio_stats(weights, returns, T):
@@ -33,7 +34,8 @@ def maximize_sharpe(weights, returns, covariance):
     return -sharpe_ratio(weights, returns, covariance)
 
 
-def calculate_eff_port_(expected_returns, covariance, ret):
+@cache.memoize()
+def calculate_eff_port(expected_returns, covariance, ret):
     nStocks = expected_returns.shape[0]
     constr = (
         dict(type="eq", fun=lambda x: np.sum(x) - 1),
@@ -55,12 +57,13 @@ def calculate_eff_port_(expected_returns, covariance, ret):
     return [res.fun] + list(np.round(res.x, 2))
 
 
-def efficient_frontier_(
+@cache.memoize()
+def efficient_frontier(
     expected_returns, covariance, ret_min=None, ret_max=None
 ):
     output = []
-    for ret in np.linspace(ret_min, ret_max, 11):
-        res = calculate_eff_port_(expected_returns, covariance, ret)
+    for ret in np.linspace(ret_min, ret_max, 100):
+        res = calculate_eff_port(expected_returns, covariance, ret)
         output.append([ret] + res)
     return pd.DataFrame(
         output,
@@ -69,7 +72,8 @@ def efficient_frontier_(
     )
 
 
-def calculate_max_sharpe_ratio_(returns, expected_returns, covariance):
+@cache.memoize()
+def calculate_max_sharpe_ratio(returns, expected_returns, covariance):
     nStocks = returns.shape[1]
     w0 = np.array([1 / nStocks for _ in range(nStocks)])
     constraints = {"type": "eq", "fun": lambda x: np.sum(x) - 1}
@@ -88,7 +92,8 @@ def calculate_max_sharpe_ratio_(returns, expected_returns, covariance):
     )
 
 
-def calculate_min_vol_(returns, expected_returns, covariance):
+@cache.memoize()
+def calculate_min_vol(returns, expected_returns, covariance):
     nStocks = returns.shape[1]
     w0 = np.array([1 / nStocks for _ in range(nStocks)])
     constraints = {"type": "eq", "fun": lambda x: np.sum(x) - 1}
@@ -107,11 +112,12 @@ def calculate_min_vol_(returns, expected_returns, covariance):
     )
 
 
-def prepare_data_():
+@cache.memoize()
+def prepare_data(days=500, stocks=20):
     data_table = (
         get_time_series_from_db(good_symbols)
         .pivot(index="Date", columns="Symbol", values="Price")
-        .iloc[-500:, 1:20]
+        .iloc[-days:, 1:stocks]
     )
     data_table.index = pd.to_datetime(data_table.index)
     returns = data_table.pct_change()

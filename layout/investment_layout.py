@@ -10,11 +10,11 @@ from app import app
 from common.extensions import cache
 from layout.reusable import create_input_box
 from lib.calc.portfolio_tools import (
-    calculate_eff_port_,
-    calculate_max_sharpe_ratio_,
-    calculate_min_vol_,
-    efficient_frontier_,
-    prepare_data_,
+    calculate_eff_port,
+    calculate_max_sharpe_ratio,
+    calculate_min_vol,
+    efficient_frontier,
+    prepare_data,
 )
 
 
@@ -43,13 +43,13 @@ def render_investment_layout():
                         create_input_box("Equity %", 80, "equity-weight"),
                         create_input_box("Bond %", 20, "bond-weight"),
                         create_input_box("Risk Level", 50, "risk-level"),
-                        dbc.Button(
-                            "Show Portfolio",
-                            color="secondary",
-                            className="mr-1",
-                            id="port-button",
-                            n_clicks=0,
-                        ),
+                        # dbc.Button(
+                        #     "Show Portfolio",
+                        #     color="secondary",
+                        #     className="mr-1",
+                        #     id="port-button",
+                        #     n_clicks=0,
+                        # ),
                     ],
                     md=4,
                 ),
@@ -61,11 +61,13 @@ def render_investment_layout():
                 ),
             ]
         ),
+        html.Div(id="result-card"),
     ]
 
 
 @app.callback(
-    Output("investment-view", "children"), [Input("risk-level", "value")],
+    [Output("investment-view", "children"), Output("result-card", "children")],
+    [Input("risk-level", "value")],
 )
 def run_portfolio(risk_level):
     if risk_level > 0 and risk_level <= 100:
@@ -82,33 +84,6 @@ def update_bond_weight(w):
         return 100
     else:
         return 100 - w
-
-
-@cache.memoize()
-def prepare_data():
-    return prepare_data_()
-
-
-@cache.memoize()
-def efficient_frontier(
-    expected_returns, covariance, ret_min=None, ret_max=None
-):
-    return efficient_frontier_(expected_returns, covariance, ret_min, ret_max)
-
-
-@cache.memoize()
-def calculate_max_sharpe_ratio(returns, expected_returns, covariance):
-    return calculate_max_sharpe_ratio_(returns, expected_returns, covariance)
-
-
-@cache.memoize()
-def calculate_min_vol(returns, expected_returns, covariance):
-    return calculate_min_vol_(returns, expected_returns, covariance)
-
-
-@cache.memoize()
-def calculate_eff_port(expected_returns, covariance, ret):
-    return calculate_eff_port_(expected_returns, covariance, ret)
 
 
 def generate_portfolio_stock_view(risk_multiplier):
@@ -154,7 +129,6 @@ def generate_portfolio_stock_view(risk_multiplier):
                 x=np.sqrt(np.diag(covariance_to_plot)),
                 mode="markers+text",
                 marker={
-                    "size": 7,
                     "color": eff_port_df.tolist()[2:],
                     "size": np.array(eff_port_df.tolist()[2:]) * 100,
                 },
@@ -181,7 +155,7 @@ def generate_portfolio_stock_view(risk_multiplier):
     )
     fig.update_layout(plot_bgcolor="#fff", paper_bgcolor="#fff")
     # fig.update_layout(height=500, width=800)
-    return dcc.Graph(figure=fig)
+    return dcc.Graph(figure=fig), port_weights_card(eff_port_df)
 
 
 @cache.memoize()
@@ -195,9 +169,19 @@ def select_ticks(eff_port_df, expected_returns, returns):
 def port_weights_card(series):
     return dbc.Card(
         dbc.CardBody(
-            [
-                html.P("{}: {}".format(index, value[0]))
-                for index, value in zip(series.index, series.values)
+            [html.H3("Portfolio Statistics")]
+            + [
+                html.H5(
+                    [
+                        index,
+                        dbc.Badge(
+                            f"{ (round(value, 2) * 100):3.0f}%",
+                            className="ml-1",
+                        ),
+                    ]
+                )
+                for index, value in zip(series.index, series.tolist())
             ]
-        )
+        ),
+        style={"width": "18rem"},
     )
