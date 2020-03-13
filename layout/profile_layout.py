@@ -69,7 +69,7 @@ def render_profile_layout():
                 ),
                 dbc.Col(
                     [
-                        html.H2("Where will you be?"),
+                        html.H2("Where are you now?"),
                         html.Div(id="waterfall-graph-now",),
                     ]
                 ),

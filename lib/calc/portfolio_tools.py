@@ -19,6 +19,10 @@ def portfolio_volatility(weights, covariance):
     return np.sqrt(weights.T.dot(covariance.dot(weights)))
 
 
+def minimize_vol(weights, covariance):
+    return -portfolio_volatility(weights, covariance)
+
+
 def sharpe_ratio(weights, returns, covariance):
     return portfolio_return(weights, returns) / portfolio_volatility(
         weights, covariance
@@ -29,36 +33,43 @@ def maximize_sharpe(weights, returns, covariance):
     return -sharpe_ratio(weights, returns, covariance)
 
 
-def efficient_frontier(returns, expected_returns, covariance):
-    nStocks = returns.shape[1]
-    covariance = returns.cov() * 250
-    expected_returns = returns.mean() * 250
-    output = []
+def calculate_eff_port_(expected_returns, covariance, ret):
+    nStocks = expected_returns.shape[0]
+    constr = (
+        dict(type="eq", fun=lambda x: np.sum(x) - 1),
+        dict(
+            type="eq",
+            fun=lambda x: portfolio_return(x, expected_returns) - ret,
+        ),
+    )
     w0 = np.array([1 / nStocks for _ in range(nStocks)])
-    for ret in np.linspace(expected_returns.min(), expected_returns.max(), 50):
-        constr = (
-            dict(type="eq", fun=lambda x: np.sum(x) - 1),
-            dict(
-                type="eq",
-                fun=lambda x: portfolio_return(x, expected_returns) - ret,
-            ),
-        )
-        bounds = tuple((0, 1) for _ in range(nStocks))
-        res = scipy.optimize.minimize(
-            portfolio_volatility,
-            w0,
-            method="SLSQP",
-            args=covariance,
-            constraints=constr,
-            bounds=bounds,
-        )
-        output.append([ret, res.fun] + list(np.round(res.x, 2)))
+    bounds = tuple((0, 1) for _ in range(nStocks))
+    res = scipy.optimize.minimize(
+        portfolio_volatility,
+        w0,
+        method="SLSQP",
+        args=covariance,
+        constraints=constr,
+        bounds=bounds,
+    )
+    return [res.fun] + list(np.round(res.x, 2))
+
+
+def efficient_frontier_(
+    expected_returns, covariance, ret_min=None, ret_max=None
+):
+    output = []
+    for ret in np.linspace(ret_min, ret_max, 11):
+        res = calculate_eff_port_(expected_returns, covariance, ret)
+        output.append([ret] + res)
     return pd.DataFrame(
-        output, columns=["returns", "vol"] + list(returns.columns + " weight")
+        output,
+        columns=["returns", "vol"]
+        + list(expected_returns.index.values + " weight"),
     )
 
 
-def calculate_max_sharpe_ratio(returns, expected_returns, covariance):
+def calculate_max_sharpe_ratio_(returns, expected_returns, covariance):
     nStocks = returns.shape[1]
     w0 = np.array([1 / nStocks for _ in range(nStocks)])
     constraints = {"type": "eq", "fun": lambda x: np.sum(x) - 1}
@@ -77,7 +88,26 @@ def calculate_max_sharpe_ratio(returns, expected_returns, covariance):
     )
 
 
-def prepare_data():
+def calculate_min_vol_(returns, expected_returns, covariance):
+    nStocks = returns.shape[1]
+    w0 = np.array([1 / nStocks for _ in range(nStocks)])
+    constraints = {"type": "eq", "fun": lambda x: np.sum(x) - 1}
+    bounds = tuple((0, 1) for x in range(nStocks))
+    min_vol = scipy.optimize.minimize(
+        portfolio_volatility,
+        w0,
+        method="SLSQP",
+        bounds=bounds,
+        args=covariance,
+        constraints=constraints,
+    )
+    return (
+        portfolio_return(min_vol.x, expected_returns),
+        portfolio_volatility(min_vol.x, covariance),
+    )
+
+
+def prepare_data_():
     data_table = (
         get_time_series_from_db(good_symbols)
         .pivot(index="Date", columns="Symbol", values="Price")
@@ -91,4 +121,3 @@ def prepare_data():
     returns = returns[expected_returns.index]
     covariance = returns.cov() * 250
     return returns, expected_returns, covariance
-

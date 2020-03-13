@@ -59,6 +59,7 @@ reason3 = dbc.Card(
 def generate_main_layout():
     navbar = dbc.NavbarSimple(
         children=[
+            # dbc.NavItem(dbc.NavLink("Profile", href="/current")),
             dbc.DropdownMenu(
                 nav=True,
                 in_navbar=True,
