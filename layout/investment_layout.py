@@ -8,7 +8,7 @@ from dash.dependencies import Input, Output
 
 from app import app
 from common.extensions import cache
-from layout.reusable import create_input_box, create_input_form
+from layout.reusable import create_input_form
 from lib.calc.portfolio_tools import (
     calculate_eff_port,
     calculate_max_sharpe_ratio,

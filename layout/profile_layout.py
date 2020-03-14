@@ -1,12 +1,11 @@
-import dash
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objects as go
-from dash.dependencies import Input, Output, State
+from dash.dependencies import Input, Output
 
 from app import app
-from layout.reusable import create_input_box
+from layout.reusable import create_input_form
 
 
 def make_card(name, content):
@@ -22,23 +21,79 @@ def profile_settings():
             make_card(
                 "Current Balance",
                 [
-                    create_input_box("Bank Account", 1500, "bank-account"),
-                    create_input_box("Savings", 1500, "my-savings"),
-                    create_input_box("Income", 4500, "monthtly-income"),
-                    create_input_box("Investments", 200, "my-investments"),
+                    create_input_form(
+                        label="Bank Account",
+                        id="bank-account",
+                        value=1500,
+                        label_width=6,
+                        input_width=5,
+                    ),
+                    create_input_form(
+                        label="Savings",
+                        id="my-savings",
+                        value=1500,
+                        label_width=6,
+                        input_width=5,
+                    ),
+                    create_input_form(
+                        label="Income",
+                        id="monthtly-income",
+                        value=4500,
+                        label_width=6,
+                        input_width=5,
+                    ),
+                    create_input_form(
+                        label="Investments",
+                        id="my-investments",
+                        value=200,
+                        label_width=6,
+                        input_width=5,
+                    ),
                 ],
             ),
             make_card(
                 "Current Debts",
-                [create_input_box("Credit Card", 1500, "credit-account")],
+                [
+                    create_input_form(
+                        label="Credit Card",
+                        id="credit-account",
+                        value=2000,
+                        label_width=6,
+                        input_width=5,
+                    )
+                ],
             ),
             make_card(
                 "Outgoings",
                 [
-                    create_input_box("Bills/Mortgage", 1500, "monthly-bills"),
-                    create_input_box("Shopping", 800, "monthly-shopping"),
-                    create_input_box("Savings", 400, "pay-in-savings"),
-                    create_input_box("Investments", 0, "pay-in-investments"),
+                    create_input_form(
+                        label="Bills/Mortgage",
+                        id="monthly-bills",
+                        value=1500,
+                        label_width=6,
+                        input_width=5,
+                    ),
+                    create_input_form(
+                        label="Shopping",
+                        id="monthly-shopping",
+                        value=800,
+                        label_width=6,
+                        input_width=5,
+                    ),
+                    create_input_form(
+                        label="Savings",
+                        id="pay-in-savings",
+                        value=400,
+                        label_width=6,
+                        input_width=5,
+                    ),
+                    create_input_form(
+                        label="Investments",
+                        id="pay-in-investments",
+                        value=0,
+                        label_width=6,
+                        input_width=5,
+                    ),
                 ],
             ),
         ],
@@ -79,28 +134,28 @@ def render_profile_layout():
     ]
 
 
-@app.callback(
-    [Output(f"collapse-{i}", "is_open") for i in range(0, 4)],
-    [Input(f"group-{i}-toggle", "n_clicks") for i in range(0, 4)],
-    [State(f"collapse-{i}", "is_open") for i in range(0, 4)],
-)
-def toggle_accordion(n0, n1, n2, n3, is_open0, is_open1, is_open2, is_open3):
-    ctx = dash.callback_context
+# @app.callback(
+#     [Output(f"collapse-{i}", "is_open") for i in range(0, 4)],
+#     [Input(f"group-{i}-toggle", "n_clicks") for i in range(0, 4)],
+#     [State(f"collapse-{i}", "is_open") for i in range(0, 4)],
+# )
+# def toggle_accordion(n0, n1, n2, n3, is_open0, is_open1, is_open2, is_open3):
+#     ctx = dash.callback_context
 
-    if not ctx.triggered:
-        return ""
-    else:
-        button_id = ctx.triggered[0]["prop_id"].split(".")[0]
+#     if not ctx.triggered:
+#         return ""
+#     else:
+#         button_id = ctx.triggered[0]["prop_id"].split(".")[0]
 
-    if button_id == "group-0-toggle" and n0:
-        return not is_open0, False, False, False
-    if button_id == "group-1-toggle" and n1:
-        return False, not is_open1, False, False
-    elif button_id == "group-2-toggle" and n2:
-        return False, False, not is_open2, False
-    elif button_id == "group-3-toggle" and n3:
-        return False, False, False, not is_open3
-    return False, False, False, False
+#     if button_id == "group-0-toggle" and n0:
+#         return not is_open0, False, False, False
+#     if button_id == "group-1-toggle" and n1:
+#         return False, not is_open1, False, False
+#     elif button_id == "group-2-toggle" and n2:
+#         return False, False, not is_open2, False
+#     elif button_id == "group-3-toggle" and n3:
+#         return False, False, False, not is_open3
+#     return False, False, False, False
 
 
 @app.callback(

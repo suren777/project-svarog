@@ -1,7 +1,7 @@
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
-from layout.reusable import create_input_box
+from layout.reusable import create_input_form
 import plotly.graph_objects as go
 import numpy as np
 from app import app
@@ -26,12 +26,26 @@ def render_future_layout():
                             to limit creditors' access to certain valuable assets 
                             while operating within the bounds of debtor-creditor law."""
                         ),
-                        create_input_box("Years Forward", 10, "sim-years"),
-                        create_input_box(
-                            "Savings Interest %", 0.2, "savings-interest"
+                        create_input_form(
+                            label="Years Forward",
+                            id="sim-years",
+                            value=10,
+                            label_width=6,
+                            input_width=5,
                         ),
-                        create_input_box(
-                            "Investments Interest %", 6, "investment-interest"
+                        create_input_form(
+                            label="Savings Interest %",
+                            id="savings-interest",
+                            value=0.2,
+                            label_width=6,
+                            input_width=5,
+                        ),
+                        create_input_form(
+                            label="Investments Interest %",
+                            id="investment-interest",
+                            value=6,
+                            label_width=6,
+                            input_width=5,
                         ),
                     ],
                     md=4,
