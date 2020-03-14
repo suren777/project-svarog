@@ -111,12 +111,14 @@ def render_profile_layout():
                         html.H2("What is Wealh?"),
                         html.P(
                             """\
-                            Wealth refers to value of everything a person or family owns. 
-                            This includes tangible items such as jewelry, housing, cars, 
-                            and other personal property. 
-                            Financial assets such as stocks and bonds, 
-                            which can be traded for cash, 
-                            also contribute to wealth. Wealth is measured as 
+                            Wealth refers to value of everything a person or
+                            family owns.
+                            This includes tangible items such as jewelry,
+                            housing, cars,
+                            and other personal property.
+                            Financial assets such as stocks and bonds,
+                            which can be traded for cash,
+                            also contribute to wealth. Wealth is measured as
                             "net assets," minus how much debt one owes."""
                         ),
                     ],

@@ -18,13 +18,16 @@ def render_future_layout():
                         html.H2("Let's talk Future"),
                         html.P(
                             """\
-                            Asset protection is the concept of and strategies for 
-                            guarding one's wealth. Asset protection is a 
-                            component of financial planning intended to protect 
-                            one's assets from creditor claims. Individuals and 
-                            business entities use asset protection techniques 
-                            to limit creditors' access to certain valuable assets 
-                            while operating within the bounds of debtor-creditor law."""
+                            Asset protection is the concept of
+                            and strategies for
+                            guarding one's wealth. Asset protection is a
+                            component of financial planning intended to protect
+                            one's assets from creditor claims. Individuals and
+                            business entities use asset protection techniques
+                            to limit creditors' access to certain valuable
+                            assets
+                            while operating within the bounds of
+                            debtor-creditor law."""
                         ),
                         create_input_form(
                             label="Years Forward",
