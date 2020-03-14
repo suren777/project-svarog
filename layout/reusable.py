@@ -35,6 +35,34 @@ def create_input_box(title, value, value_id, input_type="number"):
     )
 
 
+def create_input_form(
+    label,
+    id,
+    value,
+    type="number",
+    placeholder="",
+    label_width=2,
+    input_width=10,
+    disabled=False,
+):
+    return dbc.FormGroup(
+        [
+            dbc.Label(label, html_for="example-email-row", width=label_width),
+            dbc.Col(
+                dbc.Input(
+                    type=type,
+                    id=id,
+                    placeholder=placeholder,
+                    value=value,
+                    disabled=disabled,
+                ),
+                width=input_width,
+            ),
+        ],
+        row=True,
+    )
+
+
 # def create_input_box(title, value, value_id, input_type="number"):
 #     """
 #     Creates input box

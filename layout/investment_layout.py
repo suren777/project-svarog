@@ -8,7 +8,7 @@ from dash.dependencies import Input, Output
 
 from app import app
 from common.extensions import cache
-from layout.reusable import create_input_box
+from layout.reusable import create_input_box, create_input_form
 from lib.calc.portfolio_tools import (
     calculate_eff_port,
     calculate_max_sharpe_ratio,
@@ -40,15 +40,21 @@ def render_investment_layout():
                             each will behave differently over time."""
                         ),
                         html.H5("Portfolio Settings"),
-                        create_input_box("Equity %", 80, "equity-weight"),
-                        create_input_box("Bond %", 20, "bond-weight"),
-                        # dbc.Button(
-                        #     "Show Portfolio",
-                        #     color="secondary",
-                        #     className="mr-1",
-                        #     id="port-button",
-                        #     n_clicks=0,
-                        # ),
+                        create_input_form(
+                            label="Equity",
+                            id="equity-weight",
+                            value=80,
+                            label_width=2,
+                            input_width=4,
+                        ),
+                        create_input_form(
+                            label="Bond",
+                            id="bond-weight",
+                            value=20,
+                            label_width=2,
+                            input_width=4,
+                            disabled=True,
+                        ),
                     ],
                     md=4,
                 ),
@@ -79,12 +85,21 @@ def render_investment_layout():
                 ),
             ]
         ),
-        html.Div(id="result-card"),
+        dbc.Row(
+            [
+                dbc.Col(html.Div(id="result-card"), md=4),
+                dbc.Col(html.Div(id="stocks-weights")),
+            ]
+        ),
     ]
 
 
 @app.callback(
-    [Output("investment-view", "children"), Output("result-card", "children")],
+    [
+        Output("investment-view", "children"),
+        Output("result-card", "children"),
+        Output("stocks-weights", "children"),
+    ],
     [Input("risk-level", "value")],
 )
 def run_portfolio(risk_level):
@@ -135,25 +150,13 @@ def generate_portfolio_stock_view(risk_multiplier):
     returns_to_plot, covariance_to_plot = select_ticks(
         eff_port_df, expected_returns, returns
     )
-    fig = go.Figure(
+    fig1 = go.Figure(
         data=[
             go.Scatter(
                 x=eff_front.vol,
                 y=eff_front.returns,
                 mode="markers",
                 name="Optimal Portfolio",
-            ),
-            go.Scatter(
-                text=list(returns_to_plot.index.values),
-                y=returns_to_plot.values,
-                x=np.sqrt(np.diag(covariance_to_plot)),
-                mode="markers+text",
-                marker={
-                    "color": eff_port_df.tolist()[2:],
-                    "size": np.array(eff_port_df.tolist()[2:]) * 100,
-                },
-                name="Individual Stocks",
-                textposition="top center",
             ),
             go.Scatter(
                 text="Portfolio Position",
@@ -173,9 +176,34 @@ def generate_portfolio_stock_view(risk_multiplier):
             ),
         ]
     )
-    fig.update_layout(plot_bgcolor="#fff", paper_bgcolor="#fff")
+    fig2 = go.Figure(
+        data=[
+            go.Scatter(
+                text=list(returns_to_plot.index.values),
+                y=returns_to_plot.values,
+                x=np.sqrt(np.diag(covariance_to_plot)),
+                mode="markers+text",
+                marker={
+                    "color": eff_port_df.tolist()[2:],
+                    "size": np.array(eff_port_df.tolist()[2:]) * 100,
+                },
+                name="Individual Stocks",
+                textposition="top center",
+            ),
+        ]
+    )
+    fig1.update_layout(
+        plot_bgcolor="#e9ecef", paper_bgcolor="#e9ecef", height=350
+    )
+    fig2.update_layout(
+        plot_bgcolor="#e9ecef", paper_bgcolor="#e9ecef", height=350
+    )
     # fig.update_layout(height=500, width=800)
-    return dcc.Graph(figure=fig), port_weights_card(eff_port_df)
+    return (
+        dcc.Graph(figure=fig1),
+        port_weights_card(eff_port_df),
+        dcc.Graph(figure=fig2),
+    )
 
 
 @cache.memoize()
