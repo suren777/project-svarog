@@ -8,7 +8,7 @@ import os
 external_stylesheets = [SLATE]
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 app.config.suppress_callback_exceptions = True
-app.title = "Ethical Wealth"
+app.title = "Conscious Wealth"
 auth = dash_auth.BasicAuth(
     app, {os.environ.get("LOGIN"): os.environ.get("PASSWORD")}
 )

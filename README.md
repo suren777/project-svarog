@@ -1,5 +1,5 @@
 # Project Svarog
-# Ethical Wealth Management Platform
+# Conscious Wealth Management Platform
 
 
 

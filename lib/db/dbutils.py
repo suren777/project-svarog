@@ -6,7 +6,7 @@ from data.data import DB_LOC
 def init_db():
     db = get_db()
 
-    with open("db/schema.sql") as f:
+    with open("data/schema.sql") as f:
         db.executescript(f.read())
 
 

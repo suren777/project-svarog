@@ -122,13 +122,11 @@ def update_bond_weight(w):
 
 
 def generate_portfolio_stock_view(risk_multiplier):
-    returns, expected_returns, covariance = prepare_data()
+    _, expected_returns, covariance = prepare_data()
     max_sharpe_return, max_sharpe_vol = calculate_max_sharpe_ratio(
-        returns, expected_returns, covariance
+        expected_returns, covariance
     )
-    miv_vol_vol, min_vol_ret = calculate_min_vol(
-        returns, expected_returns, covariance
-    )
+    min_vol_ret, min_vol_vol = calculate_min_vol(expected_returns, covariance)
 
     eff_front = efficient_frontier(
         expected_returns,
@@ -144,12 +142,14 @@ def generate_portfolio_stock_view(risk_multiplier):
     )
     eff_port_df = pd.Series(
         data=[selected_return] + eff_port,
-        index=["return", "vol"] + list(returns.columns),
+        index=["return", "vol"] + list(expected_returns.index),
     )
-    eff_port_df = eff_port_df[eff_port_df > 0].dropna()
-    returns_to_plot, covariance_to_plot = select_ticks(
-        eff_port_df, expected_returns, returns
+    eff_port_df = eff_port_df[eff_port_df > 0]
+    tickers = eff_port_df[2:].index.unique()
+    returns_to_plot = (
+        expected_returns[expected_returns.index.isin(tickers)] * 252
     )
+    covariance_to_plot = covariance.loc[tickers, tickers]
     fig1 = go.Figure(
         data=[
             go.Scatter(
@@ -167,13 +167,13 @@ def generate_portfolio_stock_view(risk_multiplier):
                 name="Portfolio Position",
                 textposition="top center",
             ),
-            go.Scatter(
-                text="Capital Line",
-                y=[0, max_sharpe_return],
-                x=[0, max_sharpe_vol],
-                mode="lines",
-                name="Capital Line",
-            ),
+            # go.Scatter(
+            #     text="Capital Line",
+            #     y=[0, max_sharpe_return],
+            #     x=[0, max_sharpe_vol],
+            #     mode="lines",
+            #     name="Capital Line",
+            # ),
         ]
     )
     fig2 = go.Figure(
@@ -181,7 +181,7 @@ def generate_portfolio_stock_view(risk_multiplier):
             go.Scatter(
                 text=list(returns_to_plot.index.values),
                 y=returns_to_plot.values,
-                x=np.sqrt(np.diag(covariance_to_plot)),
+                x=np.sqrt(np.diag(covariance_to_plot) * 252),
                 mode="markers+text",
                 marker={
                     "color": eff_port_df.tolist()[2:],
@@ -210,7 +210,7 @@ def generate_portfolio_stock_view(risk_multiplier):
 def select_ticks(eff_port_df, expected_returns, returns):
     tickers = eff_port_df[2:].index.unique()
     returns_to_plot = expected_returns[expected_returns.index.isin(tickers)]
-    covariance_to_plot = np.sqrt(returns[tickers].cov() * 250)
+    covariance_to_plot = np.sqrt(returns[tickers].cov())
     return returns_to_plot, covariance_to_plot
 
 

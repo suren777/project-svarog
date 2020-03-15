@@ -18,8 +18,7 @@ CREATE TABLE stock_meta_data
     id INTEGER PRIMARY KEY,
     Symbol TEXT NOT NULL,
     Name TEXT NOT NULL,
-    Type TEXT NOT NULL,
-    Region TEXT NOT NULL
+    Sector TEXT NOT NULL
 );
 
 CREATE TABLE black_listed_symbols

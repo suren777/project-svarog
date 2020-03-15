@@ -2,32 +2,26 @@ import pandas as pd
 import numpy as np
 import scipy.optimize
 from lib.db.dbutils import get_time_series_from_db
-from data.data import good_symbols
 from common.extensions import cache
 
 
-def portfolio_stats(weights, returns, T):
-    mean = weights.dot(returns.mean().values * T)
-    std = np.sqrt(weights.dot(returns.cov().dot(weights.T)) * T)
+def portfolio_stats(weights, expected_returns, covariance):
+    mean = weights.dot(expected_returns) * 252
+    std = np.sqrt(weights.dot(covariance.dot(weights.T))) * np.sqrt(252)
     return mean, std
 
 
-def portfolio_return(weights, returns):
-    return weights.T.dot(returns.values)
+def portfolio_return(weights, expected_returns):
+    return weights.dot(expected_returns) * 252
 
 
 def portfolio_volatility(weights, covariance):
-    return np.sqrt(weights.T.dot(covariance.dot(weights)))
-
-
-def minimize_vol(weights, covariance):
-    return -portfolio_volatility(weights, covariance)
+    return np.sqrt(weights.T.dot(covariance.dot(weights))) * np.sqrt(252)
 
 
 def sharpe_ratio(weights, returns, covariance):
-    return portfolio_return(weights, returns) / portfolio_volatility(
-        weights, covariance
-    )
+    mean, std = portfolio_stats(weights, returns, covariance)
+    return mean / std
 
 
 def maximize_sharpe(weights, returns, covariance):
@@ -73,8 +67,8 @@ def efficient_frontier(
 
 
 @cache.memoize()
-def calculate_max_sharpe_ratio(returns, expected_returns, covariance):
-    nStocks = returns.shape[1]
+def calculate_max_sharpe_ratio(expected_returns, covariance):
+    nStocks = expected_returns.shape[0]
     w0 = np.array([1 / nStocks for _ in range(nStocks)])
     constraints = {"type": "eq", "fun": lambda x: np.sum(x) - 1}
     bounds = tuple((0, 1) for x in range(nStocks))
@@ -93,8 +87,8 @@ def calculate_max_sharpe_ratio(returns, expected_returns, covariance):
 
 
 @cache.memoize()
-def calculate_min_vol(returns, expected_returns, covariance):
-    nStocks = returns.shape[1]
+def calculate_min_vol(expected_returns, covariance):
+    nStocks = expected_returns.shape[0]
     w0 = np.array([1 / nStocks for _ in range(nStocks)])
     constraints = {"type": "eq", "fun": lambda x: np.sum(x) - 1}
     bounds = tuple((0, 1) for x in range(nStocks))
@@ -113,17 +107,24 @@ def calculate_min_vol(returns, expected_returns, covariance):
 
 
 @cache.memoize()
-def prepare_data(days=500, stocks=20):
+def prepare_data(days=300, stocks=20):
     data_table = (
-        get_time_series_from_db(good_symbols)
+        get_time_series_from_db()
         .pivot(index="Date", columns="Symbol", values="Price")
-        .iloc[-days:, 1:stocks]
+        .iloc[-days:, :]
     )
+
     data_table.index = pd.to_datetime(data_table.index)
     returns = data_table.pct_change()
-    expected_returns = returns.mean() * 250
+    expected_returns = returns.mean()
     expected_returns.dropna(inplace=True)
-    expected_returns = expected_returns[expected_returns < 1]
+    expected_returns = (
+        expected_returns[
+            (expected_returns * 252 < 0.2) & (expected_returns != 0)
+        ]
+        .sort_values(ascending=False)
+        .iloc[:stocks]
+    )
     returns = returns[expected_returns.index]
-    covariance = returns.cov() * 250
+    covariance = returns.cov()
     return returns, expected_returns, covariance

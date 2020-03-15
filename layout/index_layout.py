@@ -78,7 +78,7 @@ def generate_main_layout():
                 direction="left",
             ),
         ],
-        brand="Ethical Wealth",
+        brand="Conscious Wealth",
         brand_href="/",
         sticky="top",
         color="primary",
@@ -92,9 +92,9 @@ def generate_jumbotron():
     return [
         dbc.Jumbotron(
             [
-                html.H1("Ethical Wealth", className="display-3"),
+                html.H1("Conscious Wealth", className="display-3"),
                 html.P(
-                    "This platform help you to save money " "ethically.",
+                    "This platform help you to save money " "Consciously.",
                     className="lead",
                 ),
                 html.Hr(className="my-2"),
